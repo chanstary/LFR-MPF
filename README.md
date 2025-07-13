@@ -1,5 +1,4 @@
 
-```markdown
 # Self-Organizing Motion Planning for Lane-Free Roundabouts (LFR-MPF)
 
 This repository contains the core Python implementation of the **Lane-Free Roundabout Self-Organized Motion Planning Framework (LFR-MPF)**. The work is presented in the paper:
