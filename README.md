@@ -14,6 +14,10 @@ Target Guidance Model: Provides flexible, long-range path planning and exit guid
 
 Self-Organizing Yielding Strategy: Enables autonomous conflict resolution at entries and within the roundabout.
 
+ <img width="886" height="718" alt="image" src="https://github.com/user-attachments/assets/0aebe349-e8cc-4103-8eec-03119afbea0d" />
+
+Fig: Lane-Free Roundabout Self-Organizing Motion Planning Framework.
+
 About this Implementation
 This repository provides the fundamental Python scripts for the simulation logic.
 
