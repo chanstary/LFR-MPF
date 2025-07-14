@@ -51,6 +51,15 @@ This repository provides the fundamental Python scripts for the simulation logic
 - **Context of Use:** In our research, this Python backend was integrated with a custom Java-based GUI. The GUI was responsible for visualizing the simulation in real-time and allowing researchers to define the roundabout geometry and simulation parameters. This code represents the "brains" of that system.
 
 > **Disclaimer:** This implementation is a simplified version of the code used for the paper, intended for demonstration and to illustrate the core algorithms. It is provided "as-is" and may require modifications or the development of a visualization front-end to be fully runnable and replicate the paper's results.
+> 
+ntegration with Web-Based Visualization
+To achieve a full, real-time visualization as shown in our research, this Python backend must be connected to a compatible visualization front-end. The front-end used in our work is based on the movsim/traffic-simulation-de project.
+
+Frontend Repository: movsim/traffic-simulation-de
+Frontend Repository: [movsim/traffic-simulation-de](https://github.com/movsim/traffic-simulation-de)
+
+This JavaScript application is responsible for rendering the vehicle movements and roundabout geometry in a web browser. The Python code in this repository acts as the simulation server, performing all the physics calculations and passing the state of each vehicle (e.g., position, speed) to the JavaScript client at each time step.
+
 
 ## 📂 Project Structure
 
