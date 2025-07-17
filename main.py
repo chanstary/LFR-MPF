@@ -1,71 +1,109 @@
+# LFR-MPF-Simulation/main.py
+
 import numpy as np
-import matplotlib.pyplot as plt
+import time
+
+# Import from project modules
 from config import *
 from vehicle import Vehicle
-from utils import find_front_vehicle, find_follower
-from visualization import plot_trajectories, plot_final_positions
-
-def setup_simulation():
-    """Initializes vehicles for the simulation."""
-    vehicles = []
-    
-    # Define entry and exit nodes around the roundabout
-    node_angles = np.linspace(0, 2 * np.pi, NUM_NODES, endpoint=False)
-    
-    for i in range(NUM_VEHICLES):
-        # Assign random entry and exit nodes
-        entry_idx = np.random.randint(0, NUM_NODES)
-        exit_idx = (entry_idx + np.random.randint(1, NUM_NODES)) % NUM_NODES
-        
-        entry_angle = node_angles[entry_idx]
-        exit_angle = node_angles[exit_idx]
-        
-        # Place vehicles on the entry ramp
-        initial_radius = OUTER_RADIUS + 10 + i * 15 # Stagger vehicles on the ramp
-        initial_angle = entry_angle
-        
-        v = Vehicle(i, initial_angle, initial_radius, entry_angle, exit_angle)
-        v.entry_idx = entry_idx
-        v.exit_idx = exit_idx
-        vehicles.append(v)
-        
-    return vehicles
+from utils import find_approaching_leader, find_leader_in_roundabout, find_follower_in_roundabout
+from visualization import animate_simulation
 
 def run_simulation():
-    """Main simulation loop."""
-    vehicles = setup_simulation()
+    """
+    Initializes and runs the main simulation loop.
+    """
+    # --- Initialization ---
+    vehicles = [
+        Vehicle(
+            idx=i, 
+            entry_angle=0, 
+            exit_angle=0, 
+            entry_idx=-1, 
+            exit_idx=-1
+        ) for i in range(NUM_VEHICLES)
+    ]
     
-    num_steps = int(SIMULATION_TIME / DT)
-    
-    for step in range(num_steps):
-        if step % 100 == 0:
-            print(f"--- Step {step}/{num_steps} ---")
+    # Store history for visualization
+    vehicle_positions = {f"Veh[{v.idx}]": {
+        "position_x": v.position_x,
+        "position_y": v.position_y,
+        "tangential_speeds": v.tangential_speeds,
+        "radial_speeds": v.radial_speeds,
+        "exit_idx": [v.exit_idx],
+        "entry_idx": [v.entry_idx],
+    } for v in vehicles}
 
-        # Update each vehicle
-        for v in vehicles:
-            if v.out: # Skip vehicles that have exited
-                continue
-            
-            # Find interacting vehicles
-            front_vehicle = find_front_vehicle(v, vehicles)
-            follower_vehicle = find_follower(v, vehicles)
-            
-            # Update vehicle state
-            v.update(front_vehicle, follower_vehicle, DT)
+    num_steps = int(TOTAL_TIME / DT)
+    last_spawn_time = -FLOW_RATE
+    spawned_count = 0
 
-        # Optional: Print status of a vehicle
-        if step % 100 == 0:
-            print(vehicles[0])
-            
-    print("--- Simulation Finished ---")
-    return vehicles
+    # --- Main Simulation Loop ---
+    for t_step in range(num_steps):
+        current_time = t_step * DT
+        print(f"Simulating time: {current_time:.1f}s / {TOTAL_TIME}s")
 
-if __name__ == "__main__":
+        # --- Spawn New Vehicles ---
+        if current_time - last_spawn_time >= FLOW_RATE and spawned_count < NUM_VEHICLES:
+            paused_vehicles = [v for v in vehicles if v.paused]
+            if paused_vehicles:
+                vehicle_to_spawn = paused_vehicles[0]
+                entry_idx = np.random.randint(0, len(ENTRY_ANGLES))
+                exit_idx = np.random.randint(0, len(EXIT_ANGLES))
+                while entry_idx == exit_idx: # Ensure entry and exit are different
+                    exit_idx = np.random.randint(0, len(EXIT_ANGLES))
+                
+                vehicle_to_spawn.activate(entry_idx, exit_idx)
+                spawned_count += 1
+                last_spawn_time = current_time
+
+        # --- Update Vehicles ---
+        active_vehicles = [v for v in vehicles if not v.paused]
+        
+        for vehicle in active_vehicles:
+            vehicle.update_decision()
+            
+            if vehicle.radius > OUTER_RADIUS:
+                leader = find_approaching_leader(vehicle, active_vehicles)
+                follower = None
+            else:
+                leader = find_leader_in_roundabout(vehicle, active_vehicles)
+                follower = find_follower_in_roundabout(vehicle, active_vehicles)
+            
+            vehicle.update(leader, follower)
+        
+        # --- Update Paused Vehicles (to keep history lists consistent) ---
+        for vehicle in vehicles:
+            if vehicle.paused:
+                if len(vehicle.position_x) < t_step + 2:
+                    vehicle._set_paused()
+
+    print("Simulation finished.")
+
+    # --- Prepare Data for Visualization ---
+    final_vehicle_positions = {}
+    for v in vehicles:
+        final_vehicle_positions[f"Veh[{v.idx}]"] = {
+            "position_x": v.position_x,
+            "position_y": v.position_y,
+            "tangential_speeds": v.tangential_speeds,
+            "radial_speeds": v.radial_speeds,
+            "exit_idx": [v.exit_idx] * len(v.position_x),
+            "entry_idx": [v.entry_idx] * len(v.position_x),
+        }
+
+    return final_vehicle_positions
+
+
+if __name__ == '__main__':
     # Run the simulation
-    final_vehicles = run_simulation()
+    simulation_data = run_simulation()
     
-    # Visualize the results
-    plot_trajectories(final_vehicles)
-    plot_final_positions(final_vehicles)
-    plt.show()
-
+    # Animate the results
+    # Note: This requires a graphical backend and is best run in environments like Jupyter
+    try:
+        animate_simulation(simulation_data)
+    except Exception as e:
+        print(f"Could not run animation, likely due to missing graphical backend.")
+        print(f"Error: {e}")
+        print("Simulation data generation is complete.")

@@ -1,113 +1,71 @@
+# LFR-MPF-Simulation/utils.py
+
 import numpy as np
-from config import *
-from models import idm_int
+from .config import *
+from .models import idm_interaction_deceleration, idm_acceleration
+# Forward declaration to avoid circular import
+class Vehicle: pass
 
-def calculate_angle_gap(current_angle, front_angle):
-    """
-    Calculates the shortest positive angle difference from current_angle to front_angle.
-    Args:
-        current_angle (float): Current vehicle's angle in radians [0, 2π).
-        front_angle (float): Front target's angle in radians [0, 2π).
-    Returns:
-        float: The angle gap in radians [0, 2π).
-    """
-    # Normalize angles to be within [0, 2π)
-    current_angle = current_angle % (2 * np.pi)
-    front_angle = front_angle % (2 * np.pi)
 
-    gap_angle = front_angle - current_angle
-    
-    # Adjust the angle to be positive
-    if gap_angle < 0:
-        gap_angle += 2 * np.pi
+def calculate_angle_gap(start_angle, end_angle):
+    """Calculates the shortest positive angle from start_angle to end_angle."""
+    return (end_angle - start_angle + 2 * np.pi) % (2 * np.pi)
 
-    return gap_angle
-
-def find_front_vehicle(vehicle, vehicles):
-    """
-    Finds the most influential preceding vehicle for the ego vehicle.
-    The "most influential" is the one causing the strongest deceleration.
-    """
+def find_approaching_leader(vehicle, vehicles):
+    """Finds the closest vehicle directly ahead when entering the roundabout."""
     front_vehicles = []
-    
+    for other in vehicles:
+        if other.idx != vehicle.idx and other.radius < vehicle.radius:
+            is_in_lane = (vehicle.angle == other.angle and other.radius > OUTER_RADIUS)
+            is_at_entry = (calculate_angle_gap(vehicle.angle, other.angle) < np.pi/18 and
+                           OUTER_RADIUS - 5 < other.radius < OUTER_RADIUS)
+            if is_in_lane or is_at_entry:
+                front_vehicles.append(other)
+    return min(front_vehicles, key=lambda v: vehicle.radius - v.radius) if front_vehicles else None
+
+def find_leader_in_roundabout(vehicle, vehicles):
+    """Finds the leading vehicle inside the roundabout."""
+    front_vehicles = []
+    angle_to_exit = calculate_angle_gap(vehicle.angle, vehicle.exit_angle)
     for other in vehicles:
         if other.idx == vehicle.idx or other.radius > OUTER_RADIUS:
             continue
-
         angle_diff = calculate_angle_gap(vehicle.angle, other.angle)
-        
-        # Consider only vehicles within a forward perception cone (e.g., 180 degrees)
-        if angle_diff > np.pi:
-            continue
-
-        arc_length = min(vehicle.radius * angle_diff, other.radius * angle_diff)
+        arc_length = min(vehicle.radius, other.radius) * angle_diff
         radius_diff = abs(vehicle.radius - other.radius)
-        
-        # Perception range check
-        if 0 < arc_length <= 100 and radius_diff < 5:
-             front_vehicles.append(other)
-
-    if front_vehicles:
-        best_vehicle = None
-        min_tangential_acc = float('inf')
-
-        for other in front_vehicles:
-            angle_diff = calculate_angle_gap(vehicle.angle, other.angle)
-            gap = min(vehicle.radius * angle_diff, other.radius * angle_diff) - vehicle.length
-            sy = vehicle.radius - other.radius
-            tangential_acc_influence = idm_int(vehicle.tangential_speed, other.tangential_speed, gap, sy)
-
-            if tangential_acc_influence < min_tangential_acc:
-                min_tangential_acc = tangential_acc_influence
-                best_vehicle = other
-        
-        # Special condition for exiting (less yielding)
-        angle_to_exit = calculate_angle_gap(vehicle.angle, vehicle.exit_angle)
-        if min_tangential_acc > -2 and angle_to_exit < np.arcsin(30 / OUTER_RADIUS):
-            return 1 # A flag indicating clear to exit
-        else:
-            return best_vehicle
-    else:
-        # Special condition for exiting when no vehicles are ahead
-        angle_to_exit = calculate_angle_gap(vehicle.angle, vehicle.exit_angle)
-        if angle_to_exit < np.arcsin(30 / OUTER_RADIUS):
-            return 1 # A flag indicating clear to exit
+        if 0 < angle_diff < angle_to_exit and 0 < arc_length <= 100 and radius_diff < 5:
+            front_vehicles.append(other)
+    if not front_vehicles:
         return None
+    best_vehicle = min(front_vehicles, key=lambda v:
+        idm_interaction_deceleration(vehicle.tangential_speed, v.tangential_speed,
+                                     min(vehicle.radius, v.radius) * calculate_angle_gap(vehicle.angle, v.angle) - vehicle.length,
+                                     vehicle.radius - v.radius)
+    )
+    min_decel = idm_interaction_deceleration(vehicle.tangential_speed, best_vehicle.tangential_speed,
+                                            min(vehicle.radius, best_vehicle.radius) * calculate_angle_gap(vehicle.angle, best_vehicle.angle) - vehicle.length,
+                                            vehicle.radius - best_vehicle.radius)
+    if min_decel > -2 and angle_to_exit < np.math.asin(30 / OUTER_RADIUS):
+        return Vehicle.YIELD_FLAG
+    return best_vehicle
 
-def find_follower(vehicle, vehicles):
-    """
-    Finds the most influential following vehicle for the ego vehicle.
-    """
-    find_followers = []
-
+def find_follower_in_roundabout(vehicle, vehicles):
+    """Finds the following vehicle inside the roundabout."""
+    followers = []
     for other in vehicles:
         if other.idx == vehicle.idx:
             continue
-
         angle_diff = calculate_angle_gap(other.angle, vehicle.angle)
-
-        if angle_diff <= 0 or angle_diff > np.pi:
+        if not (0 < angle_diff < np.pi):
             continue
-
-        arc_length = min(vehicle.radius * angle_diff, other.radius * angle_diff)
+        arc_length = min(vehicle.radius, other.radius) * angle_diff
         radius_diff = abs(vehicle.radius - other.radius)
-        
-        if 0 < arc_length <= 100 and radius_diff < vehicle.width:
-            find_followers.append(other)
-
-    if find_followers:
-        best_vehicle = None
-        min_tangential_acc = float('inf')
-
-        for other in find_followers:
-            angle_diff = calculate_angle_gap(other.angle, vehicle.angle)
-            gap = min(vehicle.radius * angle_diff, other.radius * angle_diff) - other.length
-            sy = other.radius - vehicle.radius
-            tangential_acc_influence = idm_int(other.tangential_speed, vehicle.tangential_speed, gap, sy)
-
-            if tangential_acc_influence < min_tangential_acc:
-                min_tangential_acc = tangential_acc_influence
-                best_vehicle = other
-        return best_vehicle
-    else:
+        if 0 < arc_length <= 100 and radius_diff < vehicle.length:
+            followers.append(other)
+    if not followers:
         return None
+    return min(followers, key=lambda v:
+        idm_interaction_deceleration(v.tangential_speed, vehicle.tangential_speed,
+                                     min(vehicle.radius, v.radius) * calculate_angle_gap(v.angle, vehicle.angle) - vehicle.length,
+                                     v.radius - vehicle.radius)
+    )
