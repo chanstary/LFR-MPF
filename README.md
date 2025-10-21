@@ -41,6 +41,29 @@ The LFR-MPF is a decentralized motion planning framework designed for non-connec
   <em>Fig: Lane-Free Roundabout Self-Organizing Motion Planning Framework.</em>
 </p>
 
+## 📊 Human-like Calibration & Validation
+
+To ensure the LFR-MPF model produces realistic and human-plausible driving behavior, its key parameters were calibrated and validated using the real-world RounD dataset 8. This dataset provides detailed vehicle trajectories from the Neuweiler "lane-less" roundabout in Germany.
+
+The calibration process anchored the model's dynamics (like desired speed $v_0$, time gap $T$, and acceleration limits $a_{max}, b_{max}$) in empirically observed human driving patterns. The calibrated model was then validated against a separate set of trajectories, confirming its ability to accurately replicate real-world vehicle motion in terms of position, speed, and acceleration.
+
+ <p align="center">
+<img width="357" height="266" alt="image" src="https://github.com/user-attachments/assets/9c7080b1-623c-43e6-8e3e-4a17d15ba7bd" /><img width="533" height="266" alt="image" src="https://github.com/user-attachments/assets/3c43076e-74b1-4e8c-a4b9-30123e937f34" />
+
+  <br>
+  <em>Fig: High-resolution satellite image of the Neuweiler lane-less roundabout.</em>
+</p>
+
+
+<p align="center">
+  <img width="975" height="274" alt="image" src="https://github.com/user-attachments/assets/b513afb8-2e4b-4aa1-82e0-75374bead11e" />
+</p>
+<p align="center">
+  <img width="975" height="765" alt="image" src="https://github.com/user-attachments/assets/939eaa69-7044-4544-82e2-2eb91d32f8e4" />
+
+<br>
+  <em>Fig: LFR-MPF trajectory fitting performance in calibration and validation.</em>
+</p>
 
 ## 💻 About this Implementation
 
