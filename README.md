@@ -101,6 +101,13 @@ The following simulation environments are provided within the `scenarios/` direc
 
 Researchers can utilize these files to reproduce our core validation results or adapt them for further studies. Please refer to the `README.md` file within each scenario directory for specific instructions.
 
+<p align="center">
+  <img width="675" height="482" alt="image" src="https://github.com/user-attachments/assets/1008aa67-6fb1-4187-9d2d-31b87d0e1c8b" />
+
+  <br>
+  <em>Fig: Schematic of the Xi’an Bell Tower scenario setup.</em>
+</p>
+
 ### Running the Basic Xi'an SUMO Scenario
 
 You can run the basic SUMO simulation for the Xi'an Bell Tower (without LFR-MPF control) using the provided configuration file:
@@ -112,12 +119,6 @@ cd scenarios/xian_bell_tower/
 # Run using SUMO GUI
 sumo-gui -c run.sumocfg.
 -   
-<p align="center">
-  <img width="4260" height="3040" alt="西安钟楼" src="https://github.com/user-attachments/assets/7f363421-7110-4422-a328-808b47d6e897" />
-
-  <br>
-  <em>Fig: Schematic of the Xi’an Bell Tower scenario setup.</em>
-</p>
 
 Researchers can utilize these files to reproduce our core validation results or adapt them for further studies. Please refer to the `README.md` file within each scenario directory for specific instructions.
 
