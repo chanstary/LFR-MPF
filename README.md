@@ -91,10 +91,29 @@ The following simulation environments are provided within the `scenarios/` direc
 
 -   [cite_start]**RounD Dataset Validation (`scenarios/round/`)**: Contains scripts and configurations used for the human-like calibration and cross-site validation presented in **Section 4** [cite: 1051-1322, 1340-1404], using data from the Neuweiler and Thiergarten roundabouts.
 -   [cite_start]**Paris Charles de Gaulle Simulation (`scenarios/paris_cdg/`)**: Includes the environment setup for the large-scale, high-density simulations detailed in **Section 5** [cite: 1417-1900].
--   **Xi'an Bell Tower Configuration (`scenarios/xian_bell_tower/`)**: Provides the geometric configuration and basic setup for the Xi'an Bell Tower roundabout, including the raw OpenStreetMap data (`map.osm`) and the generated SUMO network file (`map.net.xml`). While a full analysis of this scenario is presented as future work in the paper, its inclusion here **demonstrates the framework's applicability to other complex, large-scale geometries** and allows researchers to readily extend our work.
+-   **Xi'an Bell Tower Configuration (`scenarios/xian_bell_tower/`)**: Provides the geometric configuration and a basic SUMO setup for the Xi'an Bell Tower roundabout. This includes:
+    * The raw OpenStreetMap data (`map.osm`).
+    * The generated SUMO network file (`map.net.xml`).
+    * An example traffic flow definition (`rou.rou.xml`).
+    * A SUMO configuration file (`run.sumocfg`) to run a basic simulation.
+    * GUI settings (`myGuiSettings.xml`) for visualization.
+    While a full analysis of this scenario is presented as future work in the paper, its inclusion here **demonstrates the framework's applicability to other complex, large-scale geometries** and allows researchers to readily extend our work.
+
+Researchers can utilize these files to reproduce our core validation results or adapt them for further studies. Please refer to the `README.md` file within each scenario directory for specific instructions.
+
+### Running the Basic Xi'an SUMO Scenario
+
+You can run the basic SUMO simulation for the Xi'an Bell Tower (without LFR-MPF control) using the provided configuration file:
+
+```bash
+# Navigate to the xian_bell_tower directory
+cd scenarios/xian_bell_tower/
+
+# Run using SUMO GUI
+sumo-gui -c run.sumocfg.
 -   
 <p align="center">
-  <img width="886" height="718" alt="image" src="https://github.com/user-attachments/assets/b5ff01ca-04aa-474c-9b6b-4d8a77cf7a47" />
+  <img width="4260" height="3040" alt="西安钟楼" src="https://github.com/user-attachments/assets/7f363421-7110-4422-a328-808b47d6e897" />
 
   <br>
   <em>Fig: Schematic of the Xi’an Bell Tower scenario setup.</em>
