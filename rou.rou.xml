@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-10-23 18:08:57 by Eclipse SUMO netedit Version 1.20.0
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <!-- Vehicles, persons and containers (sorted by depart) -->
+    <flow id="f_0" begin="0.00" from="28484384#4.553" to="28296475#1" end="3600.00" vehsPerHour="1800"/>
+    <flow id="f_1" begin="0.00" color="0,128,0" from="257224672#0.39" to="969449155#0" end="3600.00" vehsPerHour="1800"/>
+    <flow id="f_2" begin="0.00" color="0,128,0" from="28258941#1.641" to="28358444" end="3600.00" vehsPerHour="1800"/>
+    <flow id="f_3" begin="0.00" color="0,128,0" from="254489534" to="28258942#1" end="3600.00" vehsPerHour="1800"/>
+    <flow id="f_4" begin="0.00" color="128,0,128" from="257224672#0.39" to="28358444" end="3600.00" vehsPerHour="1800"/>
+    <flow id="f_5" begin="0.00" color="white" from="28484384#4.553" to="28258942#1" end="3600.00" vehsPerHour="1800"/>
+    <flow id="f_6" begin="0.00" color="blue" from="254489534" to="969449155#0" end="3600.00" vehsPerHour="1800"/>
+</routes>

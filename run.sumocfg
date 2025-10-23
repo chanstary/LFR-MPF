@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-12-28 22:50:13 by Eclipse SUMO sumo Version 1.20.0
+-->
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="map.net.xml"/>
+        <route-files value="rou.rou.xml"/>
+    </input>
+    <processing>
+        <time-to-teleport value="-1"/>
+    </processing>
+    <time>
+    <begin value="0"/>
+    <step-length value="0.1"/>  
+    </time>
+    <gui_only>
+        <start value="true"/> <!-- 启动时自动显示 GUI -->
+        <gui-settings-file value="myGuiSettings.xml"/> <!-- 指定 GUI 设置文件 -->
+    </gui_only>
+</configuration>
