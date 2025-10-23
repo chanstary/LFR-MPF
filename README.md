@@ -92,6 +92,13 @@ The following simulation environments are provided within the `scenarios/` direc
 -   [cite_start]**RounD Dataset Validation (`scenarios/round/`)**: Contains scripts and configurations used for the human-like calibration and cross-site validation presented in **Section 4** [cite: 1051-1322, 1340-1404], using data from the Neuweiler and Thiergarten roundabouts.
 -   [cite_start]**Paris Charles de Gaulle Simulation (`scenarios/paris_cdg/`)**: Includes the environment setup for the large-scale, high-density simulations detailed in **Section 5** [cite: 1417-1900].
 -   **Xi'an Bell Tower Configuration (`scenarios/xian_bell_tower/`)**: Provides the geometric configuration and basic setup for the Xi'an Bell Tower roundabout, including the raw OpenStreetMap data (`map.osm`) and the generated SUMO network file (`map.net.xml`). While a full analysis of this scenario is presented as future work in the paper, its inclusion here **demonstrates the framework's applicability to other complex, large-scale geometries** and allows researchers to readily extend our work.
+-   
+<p align="center">
+  <img width="886" height="718" alt="image" src="https://github.com/user-attachments/assets/b5ff01ca-04aa-474c-9b6b-4d8a77cf7a47" />
+
+  <br>
+  <em>Fig: Schematic of the Xi’an Bell Tower scenario setup.</em>
+</p>
 
 Researchers can utilize these files to reproduce our core validation results or adapt them for further studies. Please refer to the `README.md` file within each scenario directory for specific instructions.
 
